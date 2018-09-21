@@ -21,7 +21,7 @@ public class RainManager {
 
     public RainManager(Context context) {
         this.gameObjects = new ArrayList<>();
-        this.bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
+        this.bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.money);
     }
 
     public synchronized void create() {
