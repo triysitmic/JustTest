@@ -6,14 +6,18 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
-public class RainView extends SurfaceView implements Runnable, SurfaceHolder.Callback {
+import java.util.Timer;
+import java.util.TimerTask;
 
-    private Thread thread;
+public class RainView extends SurfaceView implements SurfaceHolder.Callback {
+
+    private Timer timer;
     private Canvas canvas;
     private SurfaceHolder surfaceHolder;
     private RainManager manager;
@@ -46,8 +50,18 @@ public class RainView extends SurfaceView implements Runnable, SurfaceHolder.Cal
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        thread = new Thread(this);
-        thread.start();
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                canvas = surfaceHolder.lockCanvas();
+                manager.recycleGameObjects();
+                manager.create();
+                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                manager.draw(canvas);
+                surfaceHolder.unlockCanvasAndPost(canvas);
+            }
+        }, 0, 10);
     }
 
     @Override
@@ -58,25 +72,6 @@ public class RainView extends SurfaceView implements Runnable, SurfaceHolder.Cal
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
 
-    }
-
-    @Override
-    public void run() {
-
-        while (true) {
-            canvas = surfaceHolder.lockCanvas();
-            manager.recycleGameObjects();
-            manager.create();
-            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-            manager.draw(canvas);
-            surfaceHolder.unlockCanvasAndPost(canvas);
-
-            try {
-                Thread.sleep(5);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
 }
